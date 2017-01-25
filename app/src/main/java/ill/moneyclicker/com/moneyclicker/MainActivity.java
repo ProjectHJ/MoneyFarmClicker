@@ -78,23 +78,195 @@ public class MainActivity extends AppCompatActivity {
         moneyMinerPriceText = (TextView) findViewById(R.id.moneyMinerPrice);
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
 
+        load();
+        save.start();
+        checkCounter();
+
+        makeMoney.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                thisMoney += ((Math.PI * Math.random()) + ((thisMoney) / 4) * thisMoneyCounter) / 20d;
+
+                checkPrice();
+                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+                thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney)));
+
+                saveData();
+            }
+        });
+
+        tMoney.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (treeCost <= thisMoney) {
+                    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+
+                    thisMoney -= treeCost;
+                    treeCost += (((Math.PI * Math.random()) * (treeCost * 2))) / 12d;
+                    treeCost = treeCost;
+                    moneyTreePriceText.setText(String.valueOf(currencyFormatter.format(treeCost)));
+                    tree.start();
+
+
+                    checkPrice();
+
+                    treeCounter++;
+                    save.callOnClick();
+                    tMoney.setText("Tree Level: " + treeCounter);
+                    thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney)));
+
+                    saveData();
+                }
+            }
+        });
+
+        cMoney.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (copierCost <= thisMoney) {
+                    thisMoney -= copierCost;
+                    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+
+                    copierCost += (((Math.PI * Math.random()) * (copierCost * 2))) / 12d;
+                    copierCost = copierCost;
+                    moneyCopierPriceText.setText(String.valueOf(currencyFormatter.format(copierCost)));
+                    copier.start();
+
+                    checkPrice();
+
+                    copierCounter++;
+                    save.callOnClick();
+                    cMoney.setText("Copier Level: " + copierCounter);
+                    thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney)));
+
+                    saveData();
+                }
+            }
+        });
+
+        mMoney.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (minerCost <= thisMoney) {
+                    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+
+                    thisMoney -= minerCost;
+
+                    minerCost += (((Math.PI * Math.random()) * (minerCost * 4))) / 12d;
+                    minerCost = minerCost;
+                    moneyMinerPriceText.setText(String.valueOf(currencyFormatter.format(minerCost)));
+                    miner.start();
+
+                    checkPrice();
+                    minerCounter++;
+
+                    save.callOnClick();
+                    mMoney.setText("Miner Level: " + minerCounter);
+                    thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney)));
+
+                    saveData();
+                }
+            }
+        });
+
+        save.getOnChronometerTickListener();
+        save.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+                checkPrice();
+                saveData();
+            }
+        });
+
+        tree.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+                treeMoney += (((Math.PI * Math.random()) + ((treeMoney / 2) * treeCounter))) / 560d;
+                thisMoney += treeMoney;
+
+                checkPrice();
+
+                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+                thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney)));
+
+                saveData();
+            }
+        });
+
+        copier.getOnChronometerTickListener();
+        copier.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+                copierMoney += (((Math.PI * Math.random()) + ((copierMoney / 2) * copierCounter))) / 560d;
+                thisMoney += copierMoney;
+
+                checkPrice();
+
+                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+                thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney)));
+
+                saveData();
+            }
+        });
+
+        miner.getOnChronometerTickListener();
+        miner.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+
+                minerMoney += (((Math.PI * Math.random()) + ((minerMoney / 2) * minerCounter))) / 560d;
+
+                thisMoney += minerMoney;
+                checkPrice();
+
+                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+                thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney)));
+
+                saveData();
+            }
+        });
+    }
+
+    public void saveData() {
         try {
-            thisMoney = thisMoneyCache.readCache();
-            treeMoney = treeMoneyCache.readCache();
-            treeCounter = treeCounterCache.readCache();
-            treeCost = treePriceCache.readCache();
-            copierMoney = copierMoneyCache.readCache();
-            copierCounter = copierCounterCache.readCache();
-            copierCost = copierPriceCache.readCache();
-            minerMoney = copierMoneyCache.readCache();
-            minerCounter = copierCounterCache.readCache();
-            minerCost = copierPriceCache.readCache();
+            thisMoneyCache.writeCache(thisMoney);
+            treeMoneyCache.writeCache(treeMoney);
+            treeCounterCache.writeCache(treeCounter);
+            treePriceCache.writeCache(treeCost);
+
+            copierPriceCache.writeCache(copierCost);
+            copierMoneyCache.writeCache(copierMoney);
+            copierCounterCache.writeCache(copierCounter);
+
+            minerPriceCache.writeCache(minerCost);
+            minerMoneyCache.writeCache(minerMoney);
+            minerCounterCache.writeCache(minerCounter);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        save.start();
+    public void checkPrice() {
+        if (treeCost <= thisMoney) {
+            tMoney.setEnabled(true);
+        } else {
+            tMoney.setEnabled(false);
+        }
 
+        if (copierCost <= thisMoney) {
+            cMoney.setEnabled(true);
+        } else {
+            cMoney.setEnabled(false);
+        }
+
+        if (minerCost <= thisMoney) {
+            mMoney.setEnabled(true);
+        } else {
+            mMoney.setEnabled(false);
+        }
+    }
+
+    public void checkCounter() {
+        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
         if (treeCounter > 0) {
             tree.start();
             tMoney.setText("Tree Level: " + treeCounter);
@@ -112,249 +284,22 @@ public class MainActivity extends AppCompatActivity {
             mMoney.setText("Miner Level: " + minerCounter);
             moneyMinerPriceText.setText(String.valueOf(currencyFormatter.format(minerCost)));
         }
+    }
 
-        makeMoney.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                thisMoney += ((Math.PI * Math.random()) + ((thisMoney) / 4) * thisMoneyCounter) / 20d;
-
-                if (treeCost <= thisMoney) {
-                    tMoney.setEnabled(true);
-                } else {
-                    tMoney.setEnabled(false);
-                }
-
-                if (copierCost <= thisMoney) {
-                    cMoney.setEnabled(true);
-                } else {
-                    cMoney.setEnabled(false);
-                }
-
-                if (minerCost <= thisMoney) {
-                    mMoney.setEnabled(true);
-                } else {
-                    mMoney.setEnabled(false);
-                }
-
-                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
-                thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney)));
-                save.callOnClick();
-            }
-        });
-
-        tMoney.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (treeCost <= thisMoney) {
-                    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
-
-                    thisMoney -= treeCost;
-
-                    treeCost += (((Math.PI * Math.random()) * (treeCost * 2))) / 12d;
-                    treeCost = treeCost;
-                    moneyTreePriceText.setText(String.valueOf(currencyFormatter.format(treeCost)));
-
-                    tree.start();
-
-                    if (treeCost <= thisMoney) {
-                        tMoney.setEnabled(true);
-                    } else {
-                        tMoney.setEnabled(false);
-                    }
-
-                    treeCounter++;
-
-                    save.callOnClick();
-                    tMoney.setText("Tree Level: " + treeCounter);
-
-                    thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney)));
-                }
-            }
-        });
-
-        cMoney.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (copierCost <= thisMoney) {
-                    thisMoney -= copierCost;
-                    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
-
-                    copierCost += (((Math.PI * Math.random()) * (copierCost * 2))) / 12d;
-                    copierCost = copierCost;
-                    moneyCopierPriceText.setText(String.valueOf(currencyFormatter.format(copierCost)));
-
-                    copier.start();
-
-                    if (copierCost <= thisMoney) {
-                        cMoney.setEnabled(true);
-                    } else {
-                        cMoney.setEnabled(false);
-                    }
-
-                    copierCounter++;
-
-                    save.callOnClick();
-                    cMoney.setText("Copier Level: " + copierCounter);
-
-                    thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney)));
-                }
-            }
-        });
-
-        mMoney.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (minerCost <= thisMoney) {
-                    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
-
-                    thisMoney -= minerCost;
-
-                    minerCost += (((Math.PI * Math.random()) * (minerCost * 4))) / 12d;
-                    minerCost = minerCost;
-                    moneyMinerPriceText.setText(String.valueOf(currencyFormatter.format(minerCost)));
-
-                    miner.start();
-
-                    if (minerCost <= thisMoney) {
-                        mMoney.setEnabled(true);
-                    } else {
-                        mMoney.setEnabled(false);
-                    }
-
-                    minerCounter++;
-
-                    save.callOnClick();
-                    mMoney.setText("Miner Level: " + minerCounter);
-
-                    thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney)));
-                }
-            }
-        });
-
-        save.getOnChronometerTickListener();
-        save.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
-            @Override
-            public void onChronometerTick(Chronometer chronometer) {
-
-                if (treeCost <= thisMoney) {
-                    tMoney.setEnabled(true);
-                } else {
-                    tMoney.setEnabled(false);
-                }
-
-                if (copierCost <= thisMoney) {
-                    cMoney.setEnabled(true);
-                } else {
-                    cMoney.setEnabled(false);
-                }
-
-                if (minerCost <= thisMoney) {
-                    mMoney.setEnabled(true);
-                } else {
-                    mMoney.setEnabled(false);
-                }
-
-                try {
-                    thisMoneyCache.writeCache(thisMoney);
-                    treeMoneyCache.writeCache(treeMoney);
-                    treeCounterCache.writeCache(treeCounter);
-                    treePriceCache.writeCache(treeCost);
-
-                    copierPriceCache.writeCache(copierCost);
-                    copierMoneyCache.writeCache(copierMoney);
-                    copierCounterCache.writeCache(copierCounter);
-
-                    minerPriceCache.writeCache(minerCost);
-                    minerMoneyCache.writeCache(minerMoney);
-                    minerCounterCache.writeCache(minerCounter);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        tree.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
-            @Override
-            public void onChronometerTick(Chronometer chronometer) {
-                treeMoney += (((Math.PI * Math.random()) + ((treeMoney / 2) * treeCounter))) / 560d;
-
-                thisMoney += treeMoney;
-
-                if (treeCost <= thisMoney) {
-                    tMoney.setEnabled(true);
-                } else {
-                    tMoney.setEnabled(false);
-                }
-
-                try {
-                    thisMoneyCache.writeCache(thisMoney);
-                    treeMoneyCache.writeCache(treeMoney);
-                    treeCounterCache.writeCache(treeCounter);
-                    treePriceCache.writeCache(treeCost);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
-                thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney)));
-            }
-        });
-
-        copier.getOnChronometerTickListener();
-        copier.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
-            @Override
-            public void onChronometerTick(Chronometer chronometer) {
-
-                copierMoney += (((Math.PI * Math.random()) + ((copierMoney / 2) * copierCounter))) / 560d;
-
-                thisMoney += copierMoney;
-
-                if (copierCost <= thisMoney) {
-                    cMoney.setEnabled(true);
-                } else {
-                    cMoney.setEnabled(false);
-                }
-
-                try {
-                    thisMoneyCache.writeCache(thisMoney);
-                    copierPriceCache.writeCache(copierCost);
-                    copierMoneyCache.writeCache(copierMoney);
-                    copierCounterCache.writeCache(copierCounter);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
-                thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney)));
-            }
-        });
-
-        miner.getOnChronometerTickListener();
-        miner.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
-            @Override
-            public void onChronometerTick(Chronometer chronometer) {
-
-                minerMoney += (((Math.PI * Math.random()) + ((minerMoney / 2) * minerCounter))) / 560d;
-
-                thisMoney += minerMoney;
-
-                if (minerCost <= thisMoney) {
-                    mMoney.setEnabled(true);
-                } else {
-                    mMoney.setEnabled(false);
-                }
-
-                try {
-                    thisMoneyCache.writeCache(thisMoney);
-                    minerPriceCache.writeCache(minerCost);
-                    minerMoneyCache.writeCache(minerMoney);
-                    minerCounterCache.writeCache(minerCounter);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
-                thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney)));
-            }
-        });
+    public void load() {
+        try {
+            thisMoney = thisMoneyCache.readCache();
+            treeMoney = treeMoneyCache.readCache();
+            treeCounter = treeCounterCache.readCache();
+            treeCost = treePriceCache.readCache();
+            copierMoney = copierMoneyCache.readCache();
+            copierCounter = copierCounterCache.readCache();
+            copierCost = copierPriceCache.readCache();
+            minerMoney = copierMoneyCache.readCache();
+            minerCounter = copierCounterCache.readCache();
+            minerCost = copierPriceCache.readCache();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
