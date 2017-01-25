@@ -1,0 +1,181 @@
+<html>
+<head>
+<title>MainActivity.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: rgb(0,0,0); font-weight: normal; font-style: normal; }
+.s0 { color: rgb(0,0,128); font-weight: bold; }
+.s1 { color: rgb(0,0,0); }
+.s2 { color: rgb(0,0,255); }
+.s3 { color: rgb(0,128,0); font-weight: bold; }
+</style>
+</head>
+<BODY BGCOLOR="#ffffff">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#C0C0C0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+MainActivity.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+<span class="s0">package </span><span class="s1">ill.moneyclicker.com.moneyclicker; 
+ 
+</span><span class="s0">import </span><span class="s1">android.os.Bundle; 
+</span><span class="s0">import </span><span class="s1">android.support.v7.app.AppCompatActivity; 
+</span><span class="s0">import </span><span class="s1">android.view.View; 
+</span><span class="s0">import </span><span class="s1">android.widget.Button; 
+</span><span class="s0">import </span><span class="s1">android.widget.Chronometer; 
+</span><span class="s0">import </span><span class="s1">android.widget.EditText; 
+</span><span class="s0">import </span><span class="s1">android.widget.TextView; 
+ 
+</span><span class="s0">import </span><span class="s1">com.kosalgeek.android.caching.FileCacher; 
+ 
+</span><span class="s0">import </span><span class="s1">org.w3c.dom.Text; 
+ 
+</span><span class="s0">import </span><span class="s1">java.io.IOException; 
+</span><span class="s0">import </span><span class="s1">java.text.NumberFormat; 
+ 
+</span><span class="s0">public class </span><span class="s1">MainActivity </span><span class="s0">extends </span><span class="s1">AppCompatActivity { 
+ 
+    </span><span class="s0">int </span><span class="s1">treeCounter; 
+    </span><span class="s0">double </span><span class="s1">thisMoney; 
+    </span><span class="s0">double </span><span class="s1">treeMoney; 
+    </span><span class="s0">double </span><span class="s1">totalMoney; 
+    </span><span class="s0">int </span><span class="s1">thisMoneyCounter; 
+    </span><span class="s0">double </span><span class="s1">treeCost = </span><span class="s2">10.00</span><span class="s1">; 
+ 
+    Button tMoney; 
+    Button makeMoney; 
+    Chronometer save; 
+    Chronometer tree; 
+    EditText thisMoneyText; 
+    EditText totalMoneyText; 
+    TextView moneyTreePriceText; 
+ 
+    </span><span class="s0">final </span><span class="s1">FileCacher&lt;Double&gt; thisMoneyCache = </span><span class="s0">new </span><span class="s1">FileCacher&lt;&gt;(MainActivity.</span><span class="s0">this</span><span class="s1">, </span><span class="s3">&quot;Cache_01.cache&quot;</span><span class="s1">); 
+    </span><span class="s0">final </span><span class="s1">FileCacher&lt;Double&gt; totalMoneyCache = </span><span class="s0">new </span><span class="s1">FileCacher&lt;&gt;(MainActivity.</span><span class="s0">this</span><span class="s1">, </span><span class="s3">&quot;Cache_02.cache&quot;</span><span class="s1">); 
+    </span><span class="s0">final </span><span class="s1">FileCacher&lt;Double&gt; treeMoneyCache = </span><span class="s0">new </span><span class="s1">FileCacher&lt;&gt;(MainActivity.</span><span class="s0">this</span><span class="s1">, </span><span class="s3">&quot;Cache_03.cache&quot;</span><span class="s1">); 
+    </span><span class="s0">final </span><span class="s1">FileCacher&lt;Integer&gt; treeCounterCache = </span><span class="s0">new </span><span class="s1">FileCacher&lt;&gt;(MainActivity.</span><span class="s0">this</span><span class="s1">, </span><span class="s3">&quot;Cache_04.cache&quot;</span><span class="s1">); 
+    </span><span class="s0">final </span><span class="s1">FileCacher&lt;Double&gt; treePriceCache = </span><span class="s0">new </span><span class="s1">FileCacher&lt;&gt;(MainActivity.</span><span class="s0">this</span><span class="s1">, </span><span class="s3">&quot;Cache_05.cache&quot;</span><span class="s1">); 
+ 
+    @Override 
+    </span><span class="s0">protected void </span><span class="s1">onCreate(Bundle savedInstanceState) { 
+        </span><span class="s0">super</span><span class="s1">.onCreate(savedInstanceState); 
+        setContentView(R.layout.activity_main); 
+ 
+        tMoney = (Button) findViewById(R.id.moneyTree); 
+        makeMoney = (Button) findViewById(R.id.makeMoney); 
+ 
+        thisMoneyCounter = </span><span class="s2">1</span><span class="s1">; 
+        tree = (Chronometer) findViewById(R.id.tree); 
+        save = (Chronometer) findViewById(R.id.chronometer); 
+        thisMoneyText = (EditText) findViewById(R.id.thisMoney); 
+        totalMoneyText = (EditText) findViewById(R.id.totalMoney); 
+        moneyTreePriceText = (TextView) findViewById(R.id.moneyTreePrice); 
+        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(); 
+        thisMoneyText.setText(String.valueOf(currencyFormatter.format(totalMoney))); 
+ 
+        </span><span class="s0">try </span><span class="s1">{ 
+            thisMoney = thisMoneyCache.readCache(); 
+            totalMoney = totalMoneyCache.readCache(); 
+            treeMoney = treeMoneyCache.readCache(); 
+            treeCounter = treeCounterCache.readCache(); 
+            treeCost = treePriceCache.readCache(); 
+        } </span><span class="s0">catch </span><span class="s1">(IOException e) { 
+            e.printStackTrace(); 
+        } 
+ 
+        save.start(); 
+        </span><span class="s0">if </span><span class="s1">(treeCounter &gt; </span><span class="s2">0</span><span class="s1">) { 
+            tree.start(); 
+        } 
+ 
+        makeMoney.setOnClickListener(</span><span class="s0">new </span><span class="s1">View.OnClickListener() { 
+            </span><span class="s0">public void </span><span class="s1">onClick(View v) { 
+                thisMoney += ((Math.PI * Math.random()) + ((thisMoney) / </span><span class="s2">17</span><span class="s1">) * thisMoneyCounter) / </span><span class="s2">20d</span><span class="s1">; 
+ 
+                totalMoney += thisMoney; 
+                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(); 
+                thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney))); 
+ 
+            } 
+        }); 
+ 
+        tMoney.setOnClickListener(</span><span class="s0">new </span><span class="s1">View.OnClickListener() { 
+            @Override 
+            </span><span class="s0">public void </span><span class="s1">onClick(View v) { 
+                </span><span class="s0">if </span><span class="s1">(treeCost &lt;= thisMoney) { 
+                    thisMoney -= treeCost; 
+                    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(); 
+                    thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney))); 
+ 
+                    treeCost += (((Math.PI * Math.random()) * (treeCost * </span><span class="s2">2</span><span class="s1">))) / </span><span class="s2">12d</span><span class="s1">; 
+                    treeCost = treeCost; 
+                    moneyTreePriceText.setText(String.valueOf(currencyFormatter.format(treeCost))); 
+ 
+                    tree.start(); 
+ 
+                    </span><span class="s0">if </span><span class="s1">(treeCost &lt;= thisMoney) { 
+                        tMoney.setEnabled(</span><span class="s0">true</span><span class="s1">); 
+                    } </span><span class="s0">else </span><span class="s1">{ 
+                        tMoney.setEnabled(</span><span class="s0">false</span><span class="s1">); 
+                    } 
+ 
+                    treeCounter++; 
+ 
+                    tMoney.setText(</span><span class="s3">&quot;Money Tree    Level: &quot; </span><span class="s1">+ treeCounter); 
+                } 
+            } 
+        }); 
+ 
+        save.getOnChronometerTickListener(); 
+        save.setOnChronometerTickListener(</span><span class="s0">new </span><span class="s1">Chronometer.OnChronometerTickListener() { 
+            @Override 
+            </span><span class="s0">public void </span><span class="s1">onChronometerTick(Chronometer chronometer) { 
+                </span><span class="s0">try </span><span class="s1">{ 
+                    thisMoneyCache.writeCache(thisMoney); 
+                    totalMoneyCache.writeCache(totalMoney); 
+                    treeMoneyCache.writeCache(treeMoney); 
+                    treeCounterCache.writeCache(treeCounter); 
+                    treePriceCache.writeCache(treeCost); 
+                } </span><span class="s0">catch </span><span class="s1">(IOException e) { 
+                    e.printStackTrace(); 
+                } 
+ 
+                </span><span class="s0">if </span><span class="s1">(treeCost &lt;= thisMoney) { 
+                    tMoney.setEnabled(</span><span class="s0">true</span><span class="s1">); 
+                } </span><span class="s0">else </span><span class="s1">{ 
+                    tMoney.setEnabled(</span><span class="s0">false</span><span class="s1">); 
+                } 
+ 
+                totalMoney = thisMoney; 
+                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(); 
+                totalMoneyText.setText(String.valueOf(currencyFormatter.format(totalMoney))); 
+ 
+                </span><span class="s0">if </span><span class="s1">(totalMoney &gt;= </span><span class="s2">1000.00</span><span class="s1">) { 
+                    thisMoneyCounter += </span><span class="s2">5</span><span class="s1">; 
+                } 
+ 
+            } 
+        }); 
+ 
+        tree.setOnChronometerTickListener(</span><span class="s0">new </span><span class="s1">Chronometer.OnChronometerTickListener() { 
+            @Override 
+            </span><span class="s0">public void </span><span class="s1">onChronometerTick(Chronometer chronometer) { 
+                </span><span class="s0">if </span><span class="s1">(treeCost &lt;= thisMoney) { 
+                    tMoney.setEnabled(</span><span class="s0">true</span><span class="s1">); 
+                } </span><span class="s0">else </span><span class="s1">{ 
+                    tMoney.setEnabled(</span><span class="s0">false</span><span class="s1">); 
+                } 
+ 
+                treeMoney += (((Math.PI * Math.random()) * treeCounter)) / </span><span class="s2">560d</span><span class="s1">; 
+ 
+                thisMoney += treeMoney; 
+ 
+                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(); 
+                thisMoneyText.setText(String.valueOf(currencyFormatter.format(thisMoney))); 
+            } 
+        }); 
+    } 
+}</span></pre>
+</body>
+</html>
